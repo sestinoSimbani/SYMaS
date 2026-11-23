@@ -11,11 +11,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null
+        private var syncRepository: SyncRepository? = null
         // Singleton – only one database instance for the whole app
         fun get(ctx: Context): AppDatabase = INSTANCE ?: synchronized(this) {
             INSTANCE ?: Room.databaseBuilder(
                 ctx.applicationContext, AppDatabase::class.java, "syimas.db"
-            ).build().also { INSTANCE = it }
+            ).build().also {
+                INSTANCE = it
+                syncRepository = SyncRepository(it)
+            }
         }
     }
 }

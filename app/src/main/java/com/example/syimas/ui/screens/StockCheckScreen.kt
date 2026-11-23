@@ -23,22 +23,20 @@ import com.example.syimas.data.ShopViewModel
 import com.example.syimas.ui.theme.Green
 import com.example.syimas.ui.theme.TextBlack
 import com.example.syimas.ui.theme.White
-import kotlin.math.abs
+import com.example.syimas.ui.utils.Translations
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
     val products by vm.products.collectAsStateWithLifecycle()
+    val lang by vm.language.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     var selected by remember { mutableStateOf<Long?>(null) }
     var counted  by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
-
-    // State for the bottom sheet
     var showResultSheet by remember { mutableStateOf(false) }
 
-    // Store the calculated results
     var resultExpected by remember { mutableStateOf(0.0) }
     var resultCounted by remember { mutableStateOf(0.0) }
     var resultDiff by remember { mutableStateOf(0.0) }
@@ -51,8 +49,6 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-
-        // Top padding to keep it away from the phone's status bar
         Spacer(Modifier.height(32.dp))
 
         // ---- Back arrow + Title ----
@@ -66,12 +62,12 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
             Spacer(Modifier.width(4.dp))
-            Text("Stock Check", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextBlack)
+            Text(Translations.get("stock_check", lang), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextBlack)
         }
 
         // Subtitle
         Text(
-            text = "Find Out About Remaining Day Stock",
+            text = Translations.get("stock_check_desc", lang),
             fontSize = 14.sp,
             color = TextBlack,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -81,7 +77,7 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
 
         // ---- Pick A Product ----
         Column(Modifier.padding(horizontal = 16.dp)) {
-            Text("Pick A Product", fontSize = 14.sp, color = Green, modifier = Modifier.padding(bottom = 4.dp))
+            Text(Translations.get("pick_product", lang), fontSize = 14.sp, color = Green, modifier = Modifier.padding(bottom = 4.dp))
 
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -91,9 +87,8 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                     value = product?.name ?: "",
                     onValueChange = {},
                     readOnly = true,
-                    placeholder = { Text("") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                    shape = RoundedCornerShape(50), // Pill shape
+                    shape = RoundedCornerShape(50),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
                         focusedBorderColor = Green
@@ -115,14 +110,13 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
         if (product != null) {
             Column(Modifier.padding(horizontal = 16.dp)) {
 
-                // Expected Stock Pill
                 Box(
                     modifier = Modifier
                         .background(Green.copy(alpha = 0.15f), RoundedCornerShape(50))
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        text = "Expected Stock Remaining: ${product.stockDisplay} ${product.unit}",
+                        text = "${Translations.get("expected_stock", lang)}: ${product.stockDisplay} ${product.unit}",
                         fontSize = 14.sp,
                         color = TextBlack
                     )
@@ -130,12 +124,15 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(24.dp))
 
-                // Counted Input
-                Text("How Much Is Left In ${if (product.type == "weight") "Kgs" else "Litres"}", fontSize = 14.sp, color = Green, modifier = Modifier.padding(bottom = 4.dp))
+                Text(
+                    text = "${Translations.get("how_much_left", lang)} (${if (product.type == "weight") "Kgs" else "Litres"})",
+                    fontSize = 14.sp,
+                    color = Green,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
                 OutlinedTextField(
                     value = counted,
                     onValueChange = { new -> counted = new.filter { it.isDigit() || it == '.' } },
-                    placeholder = { Text("", color = Color.LightGray) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(50),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -147,7 +144,6 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(32.dp))
 
-                // Check Stock Button
                 Button(
                     enabled = counted.toDoubleOrNull() != null,
                     onClick = {
@@ -155,20 +151,18 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                         val countedBase  = (counted.toDoubleOrNull() ?: 0.0) * 1000.0
                         val diffBase     = countedBase - expectedBase
 
-                        // Save results for the bottom sheet
                         resultExpected = expectedBase
                         resultCounted  = countedBase
                         resultDiff     = diffBase
                         resultMoneyLost = if (diffBase < 0) (-diffBase / 1000.0) * product.buyingPrice else 0.0
 
-                        // Open bottom sheet
                         showResultSheet = true
                     },
                     shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = Green),
                     modifier = Modifier.fillMaxWidth().height(56.dp)
                 ) {
-                    Text("Check Stock", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = White)
+                    Text(Translations.get("check_stock", lang), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = White)
                 }
             }
         }
@@ -178,7 +172,7 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
     if (showResultSheet && product != null) {
         ModalBottomSheet(
             onDismissRequest = { showResultSheet = false },
-            containerColor = Color(0xFFE4F1E7), // Light green background matching Figma
+            containerColor = Color(0xFFE4F1E7),
             dragHandle = {
                 Box(
                     modifier = Modifier
@@ -195,25 +189,22 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                     .padding(bottom = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Expected Pill
                 Box(
                     modifier = Modifier
                         .background(White, RoundedCornerShape(50))
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    Text("Expected: ${resultExpected/1000}${product.unit}", fontSize = 14.sp, color = TextBlack)
+                    Text("${Translations.get("expected", lang)}: ${resultExpected/1000}${product.unit}", fontSize = 14.sp, color = TextBlack)
                 }
 
-                // Counted Pill
                 Box(
                     modifier = Modifier
                         .background(White, RoundedCornerShape(50))
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    Text("Counted By You: ${resultCounted/1000}${product.unit}", fontSize = 14.sp, color = TextBlack)
+                    Text("${Translations.get("counted_by_you", lang)}: ${resultCounted/1000}${product.unit}", fontSize = 14.sp, color = TextBlack)
                 }
 
-                // Difference Pill (Color changes based on negative/positive)
                 val diffColor = if (resultDiff < 0) Color(0xFFC62828) else Green
                 val diffBgColor = if (resultDiff < 0) Color(0xFFFFEBEE) else Green.copy(alpha = 0.15f)
 
@@ -223,13 +214,12 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Text(
-                        text = "Difference: ${resultDiff/1000}${product.unit}",
+                        text = "${Translations.get("difference", lang)}: ${resultDiff/1000}${product.unit}",
                         fontSize = 14.sp,
                         color = diffColor
                     )
                 }
 
-                // Money Lost Pill (Only show if there is a loss)
                 if (resultDiff < 0) {
                     Box(
                         modifier = Modifier
@@ -237,7 +227,7 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                             .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
                         Text(
-                            text = "Money Lost: Mwk ${"%,.0f".format(resultMoneyLost)}",
+                            text = "${Translations.get("money_lost", lang)}: Mwk ${"%,.0f".format(resultMoneyLost)}",
                             fontSize = 14.sp,
                             color = Color(0xFFC62828)
                         )
@@ -246,26 +236,23 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(24.dp))
 
-                // Action Buttons Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Fix Product Button
                     Button(
                         onClick = {
                             vm.correctStock(product, resultCounted)
                             showResultSheet = false
-                            onBack() // Go back to home after fixing
+                            onBack()
                         },
                         modifier = Modifier.weight(1f).height(52.dp),
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.buttonColors(containerColor = Green)
                     ) {
-                        Text("Fix Product", fontSize = 14.sp, color = White)
+                        Text(Translations.get("fix_product", lang), fontSize = 14.sp, color = White)
                     }
 
-                    // Leave It Button
                     OutlinedButton(
                         onClick = { showResultSheet = false },
                         modifier = Modifier.weight(1f).height(52.dp),
@@ -273,7 +260,7 @@ fun StockCheckScreen(vm: ShopViewModel, onBack: () -> Unit) {
                         border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray),
                         colors = ButtonDefaults.outlinedButtonColors(containerColor = White)
                     ) {
-                        Text("Leave It", fontSize = 14.sp, color = TextBlack)
+                        Text(Translations.get("leave_it", lang), fontSize = 14.sp, color = TextBlack)
                     }
                 }
             }

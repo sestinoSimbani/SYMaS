@@ -79,6 +79,11 @@ object Translations {
                 "yes_clear" -> "Inde, Chotsani"
                 "expected" -> "Zoyembekezeka"
 
+                // added just now
+                "remaining" -> "Zotsala"
+                "stock_check_desc" -> "Dziwani za Katundu Wotsala Lero"
+                "expected_stock" -> "Katundu Woyembekezeka"
+
                 // --- NEW CHICHEWA KEYS ---
                 "product_added_success" -> "Katundu Wawonjezedwa Bwino"
                 "check_product_now" -> "Yang'anani Katundu Tsopano"
@@ -162,6 +167,11 @@ object Translations {
                 "clear_history_desc" -> "Are you sure you want to delete all past sales? This will reset your daily totals and cannot be undone."
                 "yes_clear" -> "Yes, Clear"
                 "expected" -> "Expected"
+
+                //added just now
+                "remaining" -> "Remaining"
+                "stock_check_desc" -> "Find Out About Remaining Day Stock"
+                "expected_stock" -> "Expected Stock"
 
                 // --- NEW ENGLISH KEYS ---
                 "product_added_success" -> "Product Added Successfully"

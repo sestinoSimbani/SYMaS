@@ -13,6 +13,9 @@ interface ProductDao {
     @Insert suspend fun insert(p: Product): Long
     @Update suspend fun update(p: Product)
     @Delete suspend fun delete(p: Product)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(products: List<Product>)
 }
 
 @Dao

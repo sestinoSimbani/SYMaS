@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591000985474",
+    "project_id": "syimas",
+    "storage_bucket": "syimas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591000985474:android:f109f79af6d9052f90399b",
+        "android_client_info": {
+          "package_name": "com.example.syimas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqycb18AmBnlFyaVOaQ60YGLNWIw5w_Ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -74,7 +74,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(products, key = { it.id }) { p ->
-                    ProductCard(p) { sheetProduct = p }
+                    ProductCard(p, lang) { sheetProduct = p }
                 }
             }
         }
